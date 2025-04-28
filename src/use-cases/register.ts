@@ -25,7 +25,7 @@ export class RegisterUseCases {
 
     const checkUniqueEmail = await this.usersRepository.findByEmail(email)
 
-    if (checkUniqueEmail) {
+    if (!checkUniqueEmail) {
       throw new EmailAlreadyExistsError()
     }
 
