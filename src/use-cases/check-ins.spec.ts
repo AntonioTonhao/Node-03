@@ -3,6 +3,8 @@ import { InMemoryCheckInRepository } from '@/repositories/in-memory/in-memory-ch
 import { CheckInsUseCase } from './check-ins'
 import { InMemoryGymsRepository } from '@/repositories/in-memory/in-memory-gyms-repository'
 import { Decimal } from '@prisma/client/runtime/library'
+import { CheckInTwiceInTheSameDay } from './error/check-in-twice-in-the-same-day'
+import { MaxDistanceError } from './error/max-distance-error'
 
 let checkInRepository: InMemoryCheckInRepository
 let gymsRepository: InMemoryGymsRepository
@@ -57,7 +59,7 @@ describe('Register Use Case', () => {
         userLatitude: 0,
         userLongitude: 0,
       }),
-    ).rejects.instanceOf(Error)
+    ).rejects.instanceOf(CheckInTwiceInTheSameDay)
   })
   it('should be able to check in twice in the different days ', async () => {
     vi.setSystemTime(new Date(2022, 0, 20, 3, 0, 0))
@@ -97,6 +99,6 @@ describe('Register Use Case', () => {
         userLatitude: -20.2430421,
         userLongitude: -41.9991461,
       }),
-    ).rejects.instanceOf(Error)
+    ).rejects.instanceOf(MaxDistanceError)
   })
 })
