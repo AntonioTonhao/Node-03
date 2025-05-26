@@ -11,13 +11,13 @@ interface FetchUserCheckInHistoryResponse {
 }
 
 export class FetchUserCheckInHistory {
-  constructor(private checkInRepository: CheckInRepository,) {}
+  constructor(private checkInRepository: CheckInRepository) {}
 
   async execute({
     page,
-    userId
+    userId,
   }: FetchUserCheckInHistoryRequest): Promise<FetchUserCheckInHistoryResponse> {
-    const checkIns = await this.checkInRepository.findManyUserId(userId,page)
+    const checkIns = await this.checkInRepository.findManyUserId(userId, page)
 
     return { checkIns }
   }
