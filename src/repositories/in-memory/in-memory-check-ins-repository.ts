@@ -3,7 +3,9 @@ import { CheckInRepository } from '../check-ins-repository'
 import { randomUUID } from 'node:crypto'
 import dayjs from 'dayjs'
 
+
 export class InMemoryCheckInRepository implements CheckInRepository {
+ 
   public items: CheckIn[] = []
 
   async findByUserIdOnDate(userId: string, date: Date) {
@@ -23,6 +25,11 @@ export class InMemoryCheckInRepository implements CheckInRepository {
     }
 
     return checkInSomeOnDate
+  }
+
+  async findUserMetrics(userId: string){
+     return this.items
+      .filter((checkIn) => checkIn.user_id === userId).length
   }
 
   async findManyUserId(userId: string, page: number) {
