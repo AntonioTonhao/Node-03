@@ -1,8 +1,8 @@
-import { expect, describe, it, beforeEach, afterEach } from 'vitest'
+import { expect, describe, it, beforeEach, afterEach, vi } from 'vitest'
 import { InMemoryCheckInRepository } from '@/repositories/in-memory/in-memory-check-ins-repository'
-import { Decimal } from '@prisma/client/runtime/library'
 import { ValidadeCheckInsUseCase } from './validated-check-in'
 import { ResourceNotFoundError } from './error/resource-not-found-error'
+import { LateCreateCheckInAfter20Minute } from './error/late-create-check-in-after-20-minute'
 
 
 let checkInRepository: InMemoryCheckInRepository
@@ -13,12 +13,12 @@ describe('Validated Check In Use Case', () => {
     checkInRepository = new InMemoryCheckInRepository()
     sut = new ValidadeCheckInsUseCase(checkInRepository)
 
-    // vi.useFakeTimers()
+    vi.useFakeTimers()
 
   })
 
   afterEach(() => {
-    // vi.useRealTimers()
+    vi.useRealTimers()
   })
 
   it('should to create validated check in', async () => {
@@ -46,4 +46,23 @@ describe('Validated Check In Use Case', () => {
 
   })
  
+  it('not should to create validated check in 20 minute late', async () => {
+    vi.setSystemTime(new Date(2003, 0, 1, 15, 40)) 
+    
+    const createdCheckIn = await checkInRepository.create({
+        gym_id: 'gym-01',
+        user_id: 'user-01'
+    }) 
+    
+    const minute21 = 1000 * 60 * 21
+
+    vi.advanceTimersByTime(minute21)
+
+    await expect(() => 
+      sut.execute({
+        checkInId: createdCheckIn.id
+      })
+    ).rejects.instanceOf(LateCreateCheckInAfter20Minute)
+
+  })
 })
