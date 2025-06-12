@@ -1,20 +1,37 @@
 import { Prisma, Gym } from '@prisma/client'
 import { FindManyNearbyParams, GymsRepository } from '../gyms-repository'
+import { prisma } from 'lib/prisma'
 
 export class PrismaGymsRepository implements GymsRepository {
-  create(data: Prisma.GymCreateInput): Promise<Gym> {
-    throw new Error('Method not implemented.')
+  async create(data: Prisma.GymCreateInput){
+    const gym = await prisma.gym.create({
+      data,
+    })
+
+    return gym
   }
 
-  findById(id: string): Promise<Gym | null> {
-    throw new Error('Method not implemented.')
+  async findById(id: string){
+    const gym = await prisma.gym.findUnique({
+      where: {
+        id,
+      }
+    })
+
+    return gym
   }
 
-  searchGymsQuery(query: string, page: number): Promise<Gym[]> {
-    throw new Error('Method not implemented.')
+  async searchGymsQuery(query: string, page: number){
+    const gyms = await prisma.gym.findMany({
+      where: {
+       title: query,
+      },
+      skip: (page - 1) * 20,
+      take: 20,
+    })
+
+    return gyms
   }
 
-  findManyNearby(params: FindManyNearbyParams): Promise<Gym[]> {
-    throw new Error('Method not implemented.')
-  }
+  async findManyNearby(params: FindManyNearbyParams){}
 }
