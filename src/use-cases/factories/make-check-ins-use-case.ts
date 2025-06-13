@@ -2,10 +2,10 @@ import { PrismaCheckInsRepository } from '@/repositories/prisma/prisma-check-ins
 import { CheckInsUseCase } from '../check-ins'
 import { PrismaGymsRepository } from '@/repositories/prisma/prisma-gym-repository'
 
-export default function makeAuthenticateUseCase() {
+export default function makeCheckInsUseCase() {
   const checkInsRepository = new PrismaCheckInsRepository()
   const gymInsRepository = new PrismaGymsRepository()
-  const checkInUseCase = new CheckInsUseCase(checkInsRepository,gymInsRepository)
+  const useCase = new CheckInsUseCase(checkInsRepository,gymInsRepository)
 
-  return checkInUseCase
+  return useCase
 }

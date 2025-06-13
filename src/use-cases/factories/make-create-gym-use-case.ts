@@ -3,7 +3,7 @@ import { CreateGymsUsesCase } from '../create-gym'
 
 export default function makeCreateGymUseCase() {
   const gymInsRepository = new PrismaGymsRepository()
-  const createGymsUsesCase = new CreateGymsUsesCase(gymInsRepository)
+  const useCase = new CreateGymsUsesCase(gymInsRepository)
 
-  return createGymsUsesCase
+  return useCase
 }
