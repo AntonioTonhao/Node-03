@@ -1,20 +1,20 @@
-import { CheckIn } from '@prisma/client'
-import { CheckInRepository } from '@/repositories/check-ins-repository'
-import { GymsRepository } from '@/repositories/gyms-repository'
-import { ResourceNotFoundError } from './error/resource-not-found-error'
-import { getDistanceBetweenCoordinates } from '@/utils/get-distance-between-cordinates'
-import { CheckInTwiceInTheSameDay } from './error/check-in-twice-in-the-same-day'
-import { MaxDistanceError } from './error/max-distance-error'
+import { CheckIn } from '@prisma/client';
+import { CheckInRepository } from '@/repositories/check-ins-repository';
+import { GymsRepository } from '@/repositories/gyms-repository';
+import { getDistanceBetweenCoordinates } from '@/utils/get-distance-between-cordinates';
+import { ResourceNotFoundError } from '../error/resource-not-found-error';
+import { MaxDistanceError } from '../error/max-distance-error';
+import { CheckInTwiceInTheSameDay } from '../error/check-in-twice-in-the-same-day';
 
 interface CheckInsCasesRequest {
-  gymId: string
-  userId: string
-  userLatitude: number
-  userLongitude: number
+  gymId: string;
+  userId: string;
+  userLatitude: number;
+  userLongitude: number;
 }
 
 interface CheckInsCaseResponse {
-  checkIn: CheckIn
+  checkIn: CheckIn;
 }
 
 export class CheckInsUseCase {
@@ -29,10 +29,10 @@ export class CheckInsUseCase {
     userLatitude,
     userLongitude,
   }: CheckInsCasesRequest): Promise<CheckInsCaseResponse> {
-    const gym = await this.gymsRepository.findById(gymId)
+    const gym = await this.gymsRepository.findById(gymId);
 
     if (!gym) {
-      throw new ResourceNotFoundError()
+      throw new ResourceNotFoundError();
     }
 
     const distance = getDistanceBetweenCoordinates(
@@ -44,28 +44,28 @@ export class CheckInsUseCase {
         latitude: gym.latitude.toNumber(),
         longitude: gym.longitude.toNumber(),
       },
-    )
+    );
 
-    const MAX_DISTANCE_IN_KM = 0.1
+    const MAX_DISTANCE_IN_KM = 0.1;
 
     if (distance > MAX_DISTANCE_IN_KM) {
-      throw new MaxDistanceError()
+      throw new MaxDistanceError();
     }
 
     const checkInOnSomeDate = await this.checkInRepository.findByUserIdOnDate(
       userId,
       new Date(),
-    )
+    );
 
     if (checkInOnSomeDate) {
-      throw new CheckInTwiceInTheSameDay()
+      throw new CheckInTwiceInTheSameDay();
     }
 
     const checkIn = await this.checkInRepository.create({
       gym_id: gymId,
       user_id: userId,
-    })
+    });
 
-    return { checkIn }
+    return { checkIn };
   }
 }
