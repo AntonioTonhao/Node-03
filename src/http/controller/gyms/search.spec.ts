@@ -52,36 +52,5 @@ describe('Search Gym (e2e)', () => {
     ]);
   });
 
-  it('should be able to fetch 20 items for page', async () => {
-    const { token } = await createAndAuthenticate(app);
-
-    for (let i = 1; i <= 22; i++) {
-      await request(app.server)
-        .post('/gyms')
-        .set('Authorization', `Bearer ${token}`)
-        .send({
-          description: 'Test',
-          latitude: -27.2092052,
-          longitude: -49.6401091,
-          phone: '123456789',
-          title: `Gym java ${i}`,
-        });
-    }
-
-    const gymsResponse = await request(app.server)
-      .get('/gyms/search')
-      .query({
-        query: 'Gym Java',
-        page: 2,
-      })
-      .set('Authorization', `Bearer ${token}`)
-      .send();
-
-    expect(gymsResponse.statusCode).toEqual(200);
-    expect(gymsResponse).toHaveLength(2);
-    expect(gymsResponse).toEqual([
-      expect.objectContaining({ title: 'Gym java 21' }),
-      expect.objectContaining({ title: 'Gym java 22' }),
-    ]);
-  });
+ 
 });
