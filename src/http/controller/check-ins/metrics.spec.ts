@@ -16,6 +16,8 @@ describe('Metrics check-in (e2e)', () => {
   it('should be able to have a metrics of check-in', async () => {
     const { token } = await createAndAuthenticate(app);
 
+    const user = await prisma.user.findFirstOrThrow();
+
     const gym = await prisma.gym.create({
       data: {
         title: 'Gym Test',
@@ -24,21 +26,18 @@ describe('Metrics check-in (e2e)', () => {
       },
     });
 
-    await request(app.server)
-      .post(`/gyms/${gym.id}/check-ins`)
-      .set('Authorization', `Bearer ${token}`)
-      .send({
-        latitude: -27.2092052,
-        longitude: -49.6401091,
-      });
-
-    await request(app.server)
-      .post(`/gyms/${gym.id}/check-ins`)
-      .set('Authorization', `Bearer ${token}`)
-      .send({
-        latitude: -27.2092052,
-        longitude: -49.6401091,
-      });
+    await prisma.checkIn.createMany({
+      data: [
+        {
+          gym_id: gym.id,
+          user_id: user.id,
+        },
+        {
+          gym_id: gym.id,
+          user_id: user.id,
+        },
+      ],
+    });
 
     const response = await request(app.server)
       .get('/checkIns/metrics')

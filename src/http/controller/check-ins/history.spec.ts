@@ -16,14 +16,8 @@ describe('History check-in (e2e)', () => {
   it('should be able to have a history of check-in', async () => {
     const { token } = await createAndAuthenticate(app);
 
-    const user = await prisma.user.create({
-      data:{
-        email: 'test@gmail.com',
-        name: 'test',
-        password_hash: 'test'
-      }
-    })
-    
+    const user = await prisma.user.findFirstOrThrow();
+
     const gym = await prisma.gym.create({
       data: {
         title: 'Gym Test',
@@ -32,19 +26,15 @@ describe('History check-in (e2e)', () => {
       },
     });
 
-    const checkIn = await prisma.checkIn.create({
-      data:{
-        gym_id : gym.id,
-        user_id: user.id,
-      }
-    })
-
-    await prisma.checkIn.create({
-      data:{
-        gym_id : gym.id,
-        user_id: user.id,
-      }
-    })
+    await prisma.checkIn.createMany({
+      data: [
+        {
+          gym_id: gym.id,
+          user_id: user.id,
+        },
+        { gym_id: gym.id, user_id: user.id },
+      ],
+    });
 
     const response = await request(app.server)
       .get('/checkIns/history')
@@ -54,8 +44,8 @@ describe('History check-in (e2e)', () => {
     expect(response.statusCode).toEqual(200);
     expect(response.body.checkIns).toEqual(
       expect.objectContaining([
-        {  },
-        { latitude: -27.2092052, longitude: -49.6401091 },
+        { gym_id: gym.id, user_id: user.id },
+        { gym_id: gym.id, user_id: user.id },
       ]),
     );
   });
