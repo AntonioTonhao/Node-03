@@ -14,6 +14,13 @@ app.register(checkInRoutes);
 
 app.register(fastifyJwt, {
   secret: env.JWT_SECRET,
+  sign:{
+    expiresIn: '10m'
+  },
+  cookie:{
+    cookieName: 'refreshToken',
+    signed: false,
+  }
 });
 
 app.setErrorHandler((error, _, reply) => {

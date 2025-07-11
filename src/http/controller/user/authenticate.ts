@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { FastifyRequest, FastifyReply } from 'fastify'
 import { CredentialsError } from '@/use-cases/error/credentions-error'
 import makeAuthenticateUseCase from '@/use-cases/factories/make-authenticate-use-case'
+import fastifyCookie from '@fastify/cookie'
 
 export async function authenticate(
   request: FastifyRequest,
@@ -27,11 +28,30 @@ export async function authenticate(
       {
         sign: {
           sub: user.id,
+          expiresIn: '10m'
         },
       },
     )
 
-    return reply.status(200).send({
+    const refreshToken = await reply.jwtSign(
+      {},
+      {
+        sign: {
+          sub: user.id,
+          expiresIn: '7d'
+        },
+      },
+    )
+
+    return reply
+    .setCookie('refreshToken', refreshToken,{
+      httpOnly:true,
+      secure: true,
+      path: '/',
+      sameSite: true,
+    })
+    .status(200)
+    .send({
       token,
     })
   } catch (err) {
