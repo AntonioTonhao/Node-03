@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { FastifyRequest, FastifyReply } from 'fastify'
 import { CredentialsError } from '@/use-cases/error/credentions-error'
 import makeAuthenticateUseCase from '@/use-cases/factories/make-authenticate-use-case'
-import fastifyCookie from '@fastify/cookie'
+
 
 export async function authenticate(
   request: FastifyRequest,
